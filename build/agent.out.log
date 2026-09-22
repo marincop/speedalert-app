@@ -1,0 +1,62 @@
+═══════════════════════════════════════════
+  車速守護 SpeedAlert 建置代理  2026-09-22 12:39:04
+═══════════════════════════════════════════
+═══ ① 取得程式碼 ═══
+  ✅ f16b0d9 fix: run_sim.sh 的 bundle id 一併更新
+
+═══ ② xcodegen ═══
+  Version: 2.46.0
+  ⚙️  Generating plists...
+  ⚙️  Generating project...
+  ⚙️  Writing project...
+  Created project at /Users/albert/speedalert-app/ios/SpeedAlert.xcodeproj
+  ✅ 已產生 /Users/albert/speedalert-app/ios/SpeedAlert.xcodeproj
+
+═══ ③ 版本 ═══
+  MARKETING_VERSION=0.1.0  project.yml build=1  上次建置用掉=0  →  這次用 2
+  ✅ project.yml CURRENT_PROJECT_VERSION → ��⚠️ 不 commit、不 push）
+  ⚙️  Writing project...
+  Created project at /Users/albert/speedalert-app/ios/SpeedAlert.xcodeproj
+
+═══ ④ release.sh upload ═══
+  ios=/Users/albert/speedalert-app/ios  scheme=SpeedAlert  bundle=com.trucop.speedalert  team=8NSAMAHQF3  build=2
+  指令：TEAM=8NSAMAHQF3 ASC_KEY_NAME=AuthKey_HK7BDA46FU.p8 ASC_KEY_ID=HK7BDA46FU ASC_ISSUER=4eaad410-f804-4969-aa23-4e904f33e887 ./release.sh upload
+  release.sh RC=65
+  ⚠️ /Users/albert/speedalert-app/ios/SpeedAlert.xcodeproj: error: No Accounts: Add a new account in Accounts settings. (in target 'SpeedAlert' from project 'SpeedAlert')
+  ⚠️ /Users/albert/speedalert-app/ios/SpeedAlert.xcodeproj: error: No profiles for 'com.trucop.speedalert' were found: Xcode couldn't find any iOS App Development provisioning profiles matching 'com.trucop.speedalert'. (in target 'SpeedAlert' from project 'SpeedAlert')
+  ** ARCHIVE FAILED **
+  
+  
+  The following build commands failed:
+  	Archiving project SpeedAlert with scheme SpeedAlert
+  (1 failure)
+
+❌ release.sh 失敗（RC=��見 build/release.log）
+═══════════════════════════════════════════
+  車速守護 SpeedAlert 建置代理  2026-09-22 12:39:48
+═══════════════════════════════════════════
+═══ ① 取得程式碼 ═══
+  ⚠️ 本機有未提交的改動，已備份到 /Users/albert/speedalert-app/build/pre_reset_backup-20260922-123948
+     M ios/project.yml
+
+❌ 本機有未提交的改動（已備份到 ��；為避免 git reset --hard 洗掉，中止建置
+═══════════════════════════════════════════
+  車速守護 SpeedAlert 建置代理  2026-09-22 12:40:30
+═══════════════════════════════════════════
+═══ ① 取得程式碼 ═══
+  ⚠️ 本機有未提交的改動，已備份到 /Users/albert/speedalert-app/build/pre_reset_backup-20260922-124030
+     M .build_trigger
+     D build/.failed
+     M build/agent.out.log
+
+❌ 本機有未提交的改動（已備份到 ��；為避免 git reset --hard 洗掉，中止建置
+═══════════════════════════════════════════
+  車速守護 SpeedAlert 建置代理  2026-09-22 12:41:26
+═══════════════════════════════════════════
+═══ ① 取得程式碼 ═══
+  ⚠️ 本機有未提交的改動，已備份到 /Users/albert/speedalert-app/build/pre_reset_backup-20260922-124127
+    DU .build_trigger
+    DU build/.failed
+    DU build/agent.out.log
+
+❌ 本機有未提交的改動（已備份到 ��；為避免 git reset --hard 洗掉，中止建置

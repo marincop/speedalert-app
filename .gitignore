@@ -11,3 +11,5 @@ __pycache__/
 .build_trigger
 build/*.log
 *.xcarchive
+
+build/
