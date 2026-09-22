@@ -1,0 +1,8 @@
+# build artifacts
+speed-alert-ios.tar.gz
+ios/build/
+**/xcuserdata/
+**/*.xcuserstate
+**/.DS_Store
+__pycache__/
+*.pyc

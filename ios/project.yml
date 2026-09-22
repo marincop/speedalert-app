@@ -1,0 +1,35 @@
+name: SpeedAlert
+options:
+  bundleIdPrefix: tw.speedalert
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+targets:
+  SpeedAlert:
+    type: application
+    platform: iOS
+    sources:
+      # app_data.json must land in the Resources build phase (offline dataset)
+      - path: SpeedAlert
+        excludes:
+          - "Resources/**"
+      - path: SpeedAlert/Resources
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: tw.speedalert.app
+        PRODUCT_NAME: SpeedAlert
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: SpeedAlert/Info.plist
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_STYLE: Automatic
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        # Set your Apple Developer Team ID here (or pass TEAM=… to release.sh):
+        DEVELOPMENT_TEAM: ""
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
