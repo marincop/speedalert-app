@@ -5,28 +5,30 @@ struct SettingsView: View {
     @ObservedObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
 
-    @AppStorage(AppSettings.autoSpeedKey) private var autoSpeed = true
-    @AppStorage("s500") private var s500 = true
-    @AppStorage("s300") private var s300 = true
-    @AppStorage("s100") private var s100 = true
-    @AppStorage("s0")   private var s0   = true
-    @AppStorage("k_fixed")   private var kFixed = true
-    @AppStorage("k_interval") private var kInterval = true
-    @AppStorage("k_tech")    private var kTech = true
-    @AppStorage("k_accident") private var kAccident = true
-    @AppStorage("voiceRate") private var voiceRate = 0.5
+    // Keys come from `AppSettings` so the UI and `AppModel.init()` can never
+    // disagree about a key name.
+    @AppStorage(AppSettings.autoSpeedKey) private var autoSpeed = AppSettings.autoSpeedDefault
+    @AppStorage(AppSettings.s500Key) private var s500 = AppSettings.toggleDefault
+    @AppStorage(AppSettings.s300Key) private var s300 = AppSettings.toggleDefault
+    @AppStorage(AppSettings.s100Key) private var s100 = AppSettings.toggleDefault
+    @AppStorage(AppSettings.s0Key)   private var s0   = AppSettings.toggleDefault
+    @AppStorage(AppSettings.kFixedKey)    private var kFixed    = AppSettings.toggleDefault
+    @AppStorage(AppSettings.kIntervalKey) private var kInterval = AppSettings.toggleDefault
+    @AppStorage(AppSettings.kTechKey)     private var kTech     = AppSettings.toggleDefault
+    @AppStorage(AppSettings.kAccidentKey) private var kAccident = AppSettings.toggleDefault
+    @AppStorage(AppSettings.voiceRateKey) private var voiceRate = AppSettings.voiceRateDefault
 
     var body: some View {
         NavigationStack {
             Form {
                 Section("提醒距離（公尺）") {
-                    Toggle("依車速自動調整", isOn: $autoSpeed)
+                    Toggle("依車速自動調整", isOn: live($autoSpeed))
 
                     Group {
-                        Toggle("500 公尺", isOn: $s500)
-                        Toggle("300 公尺", isOn: $s300)
-                        Toggle("100 公尺", isOn: $s100)
-                        Toggle("0 公尺（通過）", isOn: $s0)
+                        Toggle("500 公尺", isOn: live($s500))
+                        Toggle("300 公尺", isOn: live($s300))
+                        Toggle("100 公尺", isOn: live($s100))
+                        Toggle("0 公尺（通過）", isOn: live($s0))
                     }
                     .disabled(autoSpeed)
 
@@ -37,16 +39,16 @@ struct SettingsView: View {
                 }
 
                 Section("提醒種類") {
-                    Toggle("固定式／國道測速", isOn: $kFixed)
-                    Toggle("區間測速", isOn: $kInterval)
-                    Toggle("路口科技執法", isOn: $kTech)
-                    Toggle("易肇事路段", isOn: $kAccident)
+                    Toggle("固定式／國道測速", isOn: live($kFixed))
+                    Toggle("區間測速", isOn: live($kInterval))
+                    Toggle("路口科技執法", isOn: live($kTech))
+                    Toggle("易肇事路段", isOn: live($kAccident))
                 }
 
                 Section("語音") {
                     VStack(alignment: .leading) {
                         Text("語速：\(String(format: "%.2f", voiceRate))")
-                        Slider(value: $voiceRate, in: 0.3...0.7)
+                        Slider(value: live($voiceRate), in: AppSettings.voiceRateRange)
                     }
                     Text("語音：\(model.speech.voiceName)")
                         .font(.footnote).foregroundStyle(.secondary)
@@ -76,22 +78,28 @@ struct SettingsView: View {
         }
     }
 
-    /// Push current UI settings into the running model.
-    private func apply() {
-        var stages: [CLLocationDistance] = []
-        if s500 { stages.append(500) }
-        if s300 { stages.append(300) }
-        if s100 { stages.append(100) }
-        if s0   { stages.append(0) }
-        model.applySettings(manualStages: stages.isEmpty ? AlertEngine.defaultStages : stages,
-                            autoSpeed: autoSpeed)
+    /// 寫透（write-through）binding：一改就立刻套用到正在跑的 model。
+    ///
+    /// 只靠「完成」按鈕套用的話，用下滑手勢關掉設定頁（很常見）就會出現
+    /// 「UserDefaults 已經改了、但這一趟行車還是用舊設定」的落差。
+    private func live<T>(_ value: Binding<T>) -> Binding<T> {
+        Binding(get: { value.wrappedValue },
+                set: { newValue in
+                    value.wrappedValue = newValue
+                    apply()
+                })
+    }
 
-        var kinds: Set<EnforcementKind> = []
-        if kFixed    { kinds.insert(.fixedSpeed); kinds.insert(.highwaySpeed) }
-        if kInterval { kinds.insert(.intervalSpeed) }
-        if kTech     { kinds.insert(.techIntersection); kinds.insert(.techOther) }
-        if kAccident { kinds.insert(.accidentSegment) }
-        model.enabledKinds = kinds
-        model.speech.rate = Float(voiceRate)
+    /// Push current UI settings into the running model.
+    ///
+    /// 值統一透過 `AppSettings` 從 `UserDefaults` 讀回（`@AppStorage` 是同步寫入
+    /// 的），跟 `AppModel.init()` 走同一條路徑 —— 執行中的 model 與重啟後的
+    /// model 因此不可能不一致。
+    private func apply() {
+        let defaults = UserDefaults.standard
+        model.applySettings(manualStages: AppSettings.manualStages(from: defaults),
+                            autoSpeed: AppSettings.autoSpeed(from: defaults))
+        model.enabledKinds = AppSettings.enabledKinds(from: defaults)
+        model.speech.rate = AppSettings.voiceRate(from: defaults)
     }
 }

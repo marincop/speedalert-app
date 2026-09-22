@@ -2,17 +2,6 @@ import Foundation
 import CoreLocation
 import Combine
 
-/// Keys shared with the `@AppStorage` bindings in SettingsView. Kept here so
-/// AppModel can read the saved choices back at launch.
-enum AppSettings {
-    /// 「依車速自動調整提醒距離」
-    static let autoSpeedKey = "autoSpeed"
-    /// Manual distance toggles: (UserDefaults key, metres).
-    static let manualStageKeys: [(key: String, metres: CLLocationDistance)] = [
-        ("s500", 500), ("s300", 300), ("s100", 100), ("s0", 0)
-    ]
-}
-
 /// Top-level coordinator: wires location → store → alert engine → speech
 /// and publishes the state the UI needs.
 final class AppModel: ObservableObject {
@@ -29,7 +18,7 @@ final class AppModel: ObservableObject {
     @Published var alertCount: Int = 0
 
     /// Which hazard kinds are enabled (persisted via @AppStorage in the UI and
-    /// pushed here on change).
+    /// read back from UserDefaults in `init()`; pushed here on every UI change).
     var enabledKinds: Set<EnforcementKind> = Set(EnforcementKind.allCases)
 
     /// 依車速自動調整提醒距離（預設開啟）。
@@ -43,13 +32,16 @@ final class AppModel: ObservableObject {
         // Read the saved choices back before driving starts: @AppStorage only
         // pushes them into the model while the settings sheet is on screen, so
         // without this a relaunch would silently revert to the defaults.
+        //
+        // EVERY persisted setting must be read back here (the mapping lives in
+        // AppSettings) — a setting that is written by the sheet but not read
+        // here reverts to its default on relaunch. That is exactly what used to
+        // happen to 「提醒種類」 (k_accident 關掉後重啟又提醒) and 「語速」.
         let defaults = UserDefaults.standard
-        var manual: [CLLocationDistance] = []
-        for (key, metres) in AppSettings.manualStageKeys {
-            if (defaults.object(forKey: key) as? Bool) ?? true { manual.append(metres) }
-        }
-        manualStages = manual.isEmpty ? AlertEngine.defaultStages : manual
-        autoSpeedEnabled = (defaults.object(forKey: AppSettings.autoSpeedKey) as? Bool) ?? true
+        manualStages = AppSettings.manualStages(from: defaults)
+        autoSpeedEnabled = AppSettings.autoSpeed(from: defaults)
+        enabledKinds = AppSettings.enabledKinds(from: defaults)
+        speech.rate = AppSettings.voiceRate(from: defaults)
         engine.applySettings(manualStages: manualStages, autoSpeed: autoSpeedEnabled)
 
         engine.onAlert = { [weak self] text, item, stage in
