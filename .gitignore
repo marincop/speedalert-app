@@ -13,3 +13,13 @@ build/*.log
 *.xcarchive
 
 build/
+
+# Android
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/app/release/
+*.keystore
+*.jks
