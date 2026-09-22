@@ -5,6 +5,7 @@ struct SettingsView: View {
     @ObservedObject var model: AppModel
     @Environment(\.dismiss) private var dismiss
 
+    @AppStorage(AppSettings.autoSpeedKey) private var autoSpeed = true
     @AppStorage("s500") private var s500 = true
     @AppStorage("s300") private var s300 = true
     @AppStorage("s100") private var s100 = true
@@ -19,10 +20,20 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section("提醒距離（公尺）") {
-                    Toggle("500 公尺", isOn: $s500)
-                    Toggle("300 公尺", isOn: $s300)
-                    Toggle("100 公尺", isOn: $s100)
-                    Toggle("0 公尺（通過）", isOn: $s0)
+                    Toggle("依車速自動調整", isOn: $autoSpeed)
+
+                    Group {
+                        Toggle("500 公尺", isOn: $s500)
+                        Toggle("300 公尺", isOn: $s300)
+                        Toggle("100 公尺", isOn: $s100)
+                        Toggle("0 公尺（通過）", isOn: $s0)
+                    }
+                    .disabled(autoSpeed)
+
+                    Text(autoSpeed
+                         ? "已開啟自動調整：時速 60 公里以上用 500／300／100 公尺提醒，時速 30 到 60 公里用 300／100 公尺，時速 30 公里以下用 100 公尺。"
+                         : "已關閉自動調整，請選擇要提醒的距離。")
+                        .font(.footnote).foregroundStyle(.secondary)
                 }
 
                 Section("提醒種類") {
@@ -72,7 +83,8 @@ struct SettingsView: View {
         if s300 { stages.append(300) }
         if s100 { stages.append(100) }
         if s0   { stages.append(0) }
-        model.stages = stages.isEmpty ? AlertEngine.defaultStages : stages
+        model.applySettings(manualStages: stages.isEmpty ? AlertEngine.defaultStages : stages,
+                            autoSpeed: autoSpeed)
 
         var kinds: Set<EnforcementKind> = []
         if kFixed    { kinds.insert(.fixedSpeed); kinds.insert(.highwaySpeed) }
