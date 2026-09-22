@@ -30,7 +30,7 @@ echo "==> installing: $APP"
 xcrun simctl install "$UDID" "$APP"
 
 echo "==> launching"
-xcrun simctl launch "$UDID" tw.speedalert.app || true
+xcrun simctl launch "$UDID" com.trucop.speedalert || true
 
 sleep 5
 OUT="${HOME}/Desktop/speedalert.png"
