@@ -6,3 +6,8 @@ ios/build/
 **/.DS_Store
 __pycache__/
 *.pyc
+
+# 建置產物與觸發檔（不進版控）
+.build_trigger
+build/*.log
+*.xcarchive
