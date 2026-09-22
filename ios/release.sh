@@ -35,6 +35,9 @@ xcodebuild -project SpeedAlert.xcodeproj -scheme SpeedAlert \
   -archivePath build/SpeedAlert.xcarchive \
   -allowProvisioningUpdates \
   DEVELOPMENT_TEAM="$TEAM" \
+  -authenticationKeyPath "${ASC_KEY_DIR:-$HOME/.appstoreconnect/private_keys}/${ASC_KEY_NAME:-AuthKey_HK7BDA46FU.p8}" \
+  -authenticationKeyID "${ASC_KEY_ID:-HK7BDA46FU}" \
+  -authenticationKeyIssuerID "${ASC_ISSUER:-4eaad410-f804-4969-aa23-4e904f33e887}" \
   archive
 
 DEST="export"
