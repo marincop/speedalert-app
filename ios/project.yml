@@ -1,6 +1,6 @@
 name: SpeedAlert
 options:
-  bundleIdPrefix: tw.speedalert
+  bundleIdPrefix: com.trucop
   deploymentTarget:
     iOS: "16.0"
   createIntermediateGroups: true
@@ -19,7 +19,7 @@ targets:
         buildPhase: resources
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: tw.speedalert.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.trucop.speedalert
         PRODUCT_NAME: SpeedAlert
         MARKETING_VERSION: "0.1.0"
         CURRENT_PROJECT_VERSION: "1"
