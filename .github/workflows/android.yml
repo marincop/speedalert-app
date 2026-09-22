@@ -19,12 +19,13 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install SDK components
+      # ubuntu-latest already ships the Android SDK with sdkmanager on PATH.
+      # (Do NOT use android-actions/setup-android@v3 — it runs `sdkmanager tools`,
+      #  which now fails with "Failed to find package 'tools'".)
+      - name: Install Android SDK components
         run: |
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          yes | sdkmanager --licenses >/dev/null 2>&1 || true
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
