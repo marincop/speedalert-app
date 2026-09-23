@@ -20,7 +20,7 @@ class SpeedFilter(
     private var lastFixAt: Long = 0L
 
     /** Feed a raw fix. `speedMps` is `Location.getSpeed()` (metres/second). */
-    fun update(speedMps: Double, at now: Long) {
+    fun update(speedMps: Double, now: Long) {
         if (speedMps < 0) return            // invalid reading: keep last, watchdog handles it
         lastFixAt = now
         val raw = speedMps * 3.6
