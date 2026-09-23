@@ -10,6 +10,8 @@ final class AppModel: ObservableObject {
     let speech = SpeechService()
 
     private let engine = AlertEngine()
+    private var speedFilter = SpeedFilter()
+    private var speedWatchdog: Timer?
 
     @Published var driving = false
     @Published var speedKph: Double = 0
@@ -68,16 +70,36 @@ final class AppModel: ObservableObject {
             speech.activateSession()
             location.requestPermission()
             engine.reset()
+            speedFilter.reset()
             location.start()
+            startSpeedWatchdog()
         } else {
             location.stop()
+            stopSpeedWatchdog()
+            speedFilter.reset()
             nearest = []
             speedKph = 0
         }
     }
 
+    /// Refreshes the displayed speed once a second so a stopped car reads 0 even
+    /// after Core Location stops delivering fixes (see `SpeedFilter`).
+    private func startSpeedWatchdog() {
+        stopSpeedWatchdog()
+        speedWatchdog = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            guard let self, self.driving else { return }
+            self.speedKph = self.speedFilter.value(at: Date())
+        }
+    }
+
+    private func stopSpeedWatchdog() {
+        speedWatchdog?.invalidate()
+        speedWatchdog = nil
+    }
+
     private func handle(_ loc: CLLocation) {
-        speedKph = max(0, loc.speed) * 3.6
+        speedFilter.update(speedMps: loc.speed, at: Date())
+        speedKph = speedFilter.value(at: Date())
         let hits = store.nearby(loc.coordinate, radius: queryRadius, kinds: enabledKinds)
         nearest = Array(hits.prefix(8))
         engine.process(location: loc, hits: hits)

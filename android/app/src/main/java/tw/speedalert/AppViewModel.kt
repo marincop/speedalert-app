@@ -3,8 +3,10 @@ package tw.speedalert
 import android.app.Application
 import android.content.Intent
 import android.os.Build
+import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -13,6 +15,7 @@ import tw.speedalert.alert.AlertPhrase
 import tw.speedalert.data.EnforcementStore
 import tw.speedalert.location.DrivingService
 import tw.speedalert.location.LocationBus
+import tw.speedalert.location.SpeedFilter
 import tw.speedalert.model.EnforcementKind
 import tw.speedalert.model.NearbyHit
 import tw.speedalert.speech.SpeechService
@@ -23,6 +26,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     val store = EnforcementStore(app)
     private val speech = SpeechService(app)
     private val engine = AlertEngine()
+    private val speedFilter = SpeedFilter()
 
     private val _driving = MutableStateFlow(false)
     val driving: StateFlow<Boolean> = _driving
@@ -57,10 +61,18 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                 }
             }
         }
+        // 靜止看門狗：每秒刷新顯示速度，讓停下後（系統不再送點）也能歸零。
+        viewModelScope.launch {
+            while (true) {
+                delay(1000)
+                if (_driving.value) _speed.value = speedFilter.value(SystemClock.elapsedRealtime())
+            }
+        }
     }
 
     private fun handle(lat: Double, lon: Double, speedMps: Double) {
-        _speed.value = (speedMps * 3.6).coerceAtLeast(0.0)
+        speedFilter.update(speedMps, SystemClock.elapsedRealtime())
+        _speed.value = speedFilter.value(SystemClock.elapsedRealtime())
         val hits = store.nearby(lat, lon, queryRadius, enabledKinds)
         _nearest.value = hits.take(8)
         engine.process(hits)
@@ -72,6 +84,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
             app.stopService(Intent(app, DrivingService::class.java))
             _driving.value = false
             _nearest.value = emptyList()
+            speedFilter.reset()
             _speed.value = 0.0
         } else {
             engine.reset()

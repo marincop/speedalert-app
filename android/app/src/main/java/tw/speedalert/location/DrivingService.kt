@@ -28,8 +28,11 @@ class DrivingService : Service() {
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         startForeground(NOTIF_ID, buildNotification())
         try {
-            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 5f, listener)
-            locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000L, 5f, listener)
+            // minDistance = 0: a speedometer must keep receiving fixes while the
+            // car is *stopped*. With a distance gate the OS goes silent and the
+            // last speed stays frozen on screen (see SpeedFilter).
+            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 0f, listener)
+            locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000L, 0f, listener)
         } catch (_: SecurityException) {
             // location permission not granted yet
         }

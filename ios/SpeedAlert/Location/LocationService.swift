@@ -16,7 +16,10 @@ final class LocationService: NSObject, ObservableObject, CLLocationManagerDelega
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
-        manager.distanceFilter = 10                 // metres; balances battery vs. accuracy
+        // A speedometer must keep receiving fixes when the car is *stopped*.
+        // With a distance filter the OS goes silent once you stop moving and
+        // the last speed stays frozen on screen — so we take every fix.
+        manager.distanceFilter = kCLDistanceFilterNone
         manager.activityType = .automotiveNavigation
         manager.pausesLocationUpdatesAutomatically = false
         manager.showsBackgroundLocationIndicator = true
