@@ -24,3 +24,6 @@ android/app/release/
 *.keystore
 *.jks
 *.apk
+
+# XcodeGen 產物（由 project.yml 產生，不進版控）
+ios/SpeedAlert.xcodeproj/

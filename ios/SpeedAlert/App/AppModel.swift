@@ -98,7 +98,14 @@ final class AppModel: ObservableObject {
     }
 
     private func handle(_ loc: CLLocation) {
-        speedFilter.update(speedMps: loc.speed, at: Date())
+        // 把定位品質與座標一起餵進去：SpeedFilter 需要「位移」當第二個證據，
+        // 才能在停車雜訊（GPS 說 4~8 km/h）時正確顯示 0。
+        speedFilter.update(speedMps: loc.speed,
+                           horizontalAccuracy: loc.horizontalAccuracy,
+                           speedAccuracy: loc.speedAccuracy,
+                           latitude: loc.coordinate.latitude,
+                           longitude: loc.coordinate.longitude,
+                           at: Date())
         speedKph = speedFilter.value(at: Date())
         let hits = store.nearby(loc.coordinate, radius: queryRadius, kinds: enabledKinds)
         nearest = Array(hits.prefix(8))
