@@ -20,24 +20,26 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>UILaunchScreen</key>
-	<dict/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>開車時需要在背景持續定位，才能即時語音提醒測速照相與限速。</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>開車時需要在背景持續定位，才能即時語音提醒測速照相與限速。</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>需要定位，才能在接近測速照相、區間測速與易肇事路段時提醒你。</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
 		<string>audio</string>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>需要定位，才能在接近測速照相、區間測速與易肇事路段時提醒你。</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>開車時需要在背景持續定位，才能即時語音提醒測速照相與限速。</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>開車時需要在背景持續定位，才能即時語音提醒測速照相與限速。</string>
 </dict>
 </plist>
